@@ -53,6 +53,46 @@ const AppContext = React.createContext()
 const AppProvider = ({ children }) => {
   // const [state, setState] = useState(initialState)
   const [state, dispatch] = useReducer(reducer, initialState)
+
+  /*02.use 'axios.defaults.config[name]=value' to avoid coding every time(see 1. in this file) */
+  // axios.defaults.headers['Authorization'] = `Bearer ${state.token}`
+
+  /*03.use 'axios.create()' to add more default settings*/
+  // const authFetch = axios.create({
+  //   baseURL: '/api',
+  //   headers: { Authorization: `Bearer ${state.token}` },
+  // })
+
+  /*04.use 'interceptors' as middleware to add more default functions and error handlings*/
+  const authFetch = axios.create({
+    baseURL: '/api',
+  })
+
+  //request settings
+  authFetch.interceptors.request.use(
+    (config) => {
+      config.headers['Authorization'] = `Bearer ${state.token}` //without this line of code in request settings, will lead to an 'auth error' in response settings
+      return config
+    },
+    (error) => {
+      return Promise.reject(error)
+    }
+  )
+  //response settings
+  authFetch.interceptors.response.use(
+    (response) => {
+      return response
+    },
+    (error) => {
+      console.log(error.response)
+      if (error.response.status === 401) {
+        // console.log('auth error')
+        logoutUser()
+      }
+      return Promise.reject(error)
+    }
+  )
+
   const displayAlert = () => {
     dispatch({ type: DISPLAY_ALERT })
     clearAlert()
@@ -126,6 +166,7 @@ const AppProvider = ({ children }) => {
     // console.log(currentUser)
 
     dispatch({ type: SETUP_USER_BEGIN })
+
     try {
       const { data } = await axios.post(`/api/auth/${endPoint}`, currentUser)
       const { user, token, location } = data
@@ -139,8 +180,8 @@ const AppProvider = ({ children }) => {
         type: SETUP_USER_ERROR,
         payload: { msg: error.response.data.msg },
       })
-      clearAlert()
     }
+    clearAlert()
   }
 
   const toggleSidebar = () => {
@@ -153,10 +194,71 @@ const AppProvider = ({ children }) => {
     removeUserFromLocalStorage()
   }
 
+  // const updateUser = async (currentUser) => {
+  //   // console.log(currentUser)
+
+  // try {
+  //   /*1.use 'axios' to read data, and set Authorization option/config to 'axios' */
+  //   // const { data } = await axios.patch('api/auth/updateUser', currentUser, {
+  //   //   headers: { Authorization: `Bearer ${state.token}` },
+  //   // })
+
+  //   /*2.take the config part out, use 'axios.defaults.config[name]=value'(see 02. in this file) to avoid coding every time*/
+  //   // const { data } = await axios.patch('api/auth/updateUser', currentUser)
+
+  //   /*3.use 'axios.create()' to add more default settings(see 03. in this file) */
+  //   const { data } = await authFetch.patch('/auth/updateUser', currentUser)
+
+  //   console.log(data)
+  // } catch (error) {
+  //   // console.log(error.response)
+  //   /*4.use 'interceptors' as middleware to add more default functions and error handlings(see 04. in this file) */
+  // }
+  // }
+
+  /*add actions */
+  const updateUser = async (currentUser, alertText) => {
+    try {
+      dispatch({ type: SETUP_USER_BEGIN })
+
+      const { data } = await authFetch.patch('/auth/updateUser', currentUser)
+      // const { user, token, location } = data
+      const { user, location } = data //`token won't change, so no need to update token`
+
+      alertText = 'User Profile Updated!' //`update alertText`
+      dispatch({
+        type: SETUP_USER_SUCCESS,
+        payload: { user, token, location, alertText },
+      })
+      // addUserToLocalStorage({ user, token, location })
+      addUserToLocalStorage({ user, token: initialState.token, location }) //`just use initial token`
+    } catch (error) {
+      alertText = error.response.data.msg
+      // dispatch({
+      //   type: SETUP_USER_ERROR,
+      //   payload: { msg: alertText },
+      // })
+      if (error.response.status !== 401) {
+        dispatch({
+          type: SETUP_USER_ERROR,
+          payload: { msg: alertText },
+        })
+      } //`add auth error condition`
+    }
+    clearAlert()
+  }
+
   return (
     <AppContext.Provider
       // value={{ ...state, displayAlert, registerUser, loginUser }}
-      value={{ ...state, displayAlert, setupUser, toggleSidebar, logoutUser }}
+      value={{
+        ...state,
+        displayAlert,
+        setupUser,
+        toggleSidebar,
+        logoutUser,
+        updateUser,
+      }}
     >
       {children}
     </AppContext.Provider>

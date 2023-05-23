@@ -44,7 +44,7 @@ import { Landing, Error, Register, ProtectedRoute } from './pages'
 import {
   AddJob,
   AllJobs,
-  Status,
+  Stats,
   SharedLayout,
   Profile,
 } from './pages/dashboard'
@@ -64,7 +64,7 @@ function App() {
           }
         >
           {/* <Route path='status' element={<Status />} /> */}
-          <Route index element={<Status />} />
+          <Route index element={<Stats />} />
 
           <Route path='add-job' element={<AddJob />} />
           <Route path='all-jobs' element={<AllJobs />} />

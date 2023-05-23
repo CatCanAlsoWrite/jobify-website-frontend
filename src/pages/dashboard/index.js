@@ -1,7 +1,7 @@
 import AddJob from './AddJob'
 import AllJobs from './AllJobs'
-import Status from './Status'
+import Stats from './Stats'
 import SharedLayout from './SharedLayout'
 import Profile from './Profile'
 
-export { AddJob, AllJobs, Status, SharedLayout, Profile }
+export { AddJob, AllJobs, Stats, SharedLayout, Profile }
