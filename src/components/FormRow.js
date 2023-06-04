@@ -9,7 +9,7 @@
   className='form-input'
 /> */
 
-const FormRow = ({ name, type, value, onChange, labelText }) => {
+const FormRow = ({ type, name, value, onChange, labelText }) => {
   return (
     <div className='form-row'>
       <label htmlFor={name} className='form-label'>

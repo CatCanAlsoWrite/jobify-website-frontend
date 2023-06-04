@@ -16,6 +16,9 @@ import {
   SETUP_USER_ERROR,
   TOGGLE_SIDEBAR,
   LOGOUT_USER,
+  CREATE_JOB_BEGIN,
+  CREATE_JOB_SUCCESS,
+  CREATE_JOB_ERROR,
 } from './action'
 
 /*basic setting of initialState */
@@ -46,6 +49,13 @@ const initialState = {
   userLocation: userLocation || '',
   jobLocation: userLocation || '',
   showSidebar: false,
+  createdBy: '',
+  company: '',
+  position: '',
+  jobTypeOptions: ['full-time', 'part-time', 'remote', 'internship'],
+  jobType: 'full-time',
+  statusOptions: ['pending', 'interview', 'declined'],
+  stauts: 'pending',
 }
 
 const AppContext = React.createContext()
@@ -246,6 +256,19 @@ const AppProvider = ({ children }) => {
       } //`add auth error condition`
     }
     clearAlert()
+  }
+
+  const createJob = async ({
+    company,
+    position,
+    jobLocation,
+    jobType,
+    status,
+    createdBy,
+  }) => {
+    try {
+      dispatch({ type: CREATE_JOB_BEGIN })
+    } catch (error) {}
   }
 
   return (

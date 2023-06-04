@@ -9,8 +9,7 @@ import { FormRow, Alert } from '../../components'
 import Wrapper from '../../assets/wrappers/DashboardFormPage'
 
 const Profile = () => {
-  const { user, isLoading, showAlert, displayAlert, updateUser } =
-    useAppContext()
+  const { user, isLoading, showAlert, updateUser } = useAppContext()
   const [name, setName] = useState(user?.name)
   const [email, setEmail] = useState(user?.email)
   const [lastName, setLastName] = useState(user?.lastName)

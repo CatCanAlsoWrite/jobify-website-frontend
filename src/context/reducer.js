@@ -12,6 +12,9 @@ import {
   SETUP_USER_ERROR,
   TOGGLE_SIDEBAR,
   LOGOUT_USER,
+  CREATE_JOB_BEGIN,
+  CREATE_JOB_SUCCESS,
+  CREATE_JOB_ERROR,
 } from './action'
 
 import { initialState } from './appContext' //`remember to import the right data 'initialState', instead of 'useAppContext'`
@@ -120,7 +123,7 @@ const reducer = (state, action) => {
       alertType: 'danger',
       alertText: action.payload.msg,
     }
-  }
+  } //`???isLoading: false or true`
 
   if (action.type === TOGGLE_SIDEBAR) {
     return { ...state, showSidebar: !state.showSidebar }
@@ -137,6 +140,32 @@ const reducer = (state, action) => {
     }
   }
 
+  if (action.type === CREATE_JOB_BEGIN) {
+    return {
+      ...state,
+      isLoading: true,
+    }
+  }
+  if (action.type === CREATE_JOB_SUCCESS) {
+    return {
+      ...state,
+      isLoading: false,
+      company: action.payload.company,
+      position: action.payload.position,
+      showAlert: true,
+      alertType: 'success',
+      alertText: 'New Job Created!',
+    }
+  }
+  if (action.type === CREATE_JOB_ERROR) {
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertType: 'danger',
+      alertText: action.payload.msg,
+    }
+  } //`???isLoading: false or true`
   throw new Error(`not found action: ${action.type}`)
 }
 export default reducer
